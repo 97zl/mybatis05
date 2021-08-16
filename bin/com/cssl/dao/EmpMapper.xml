@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- namespace映射dao接口的全路径 -->
+<mapper namespace="com.cssl.dao.EmpMapper">
+
+  <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+  <!-- <cache readOnly="false" size="1024" eviction="LRU" /> -->
+
+  <insert id="insert" parameterType="Emp"
+  	keyColumn="empno" keyProperty="empno">
+  	insert into emp(ename,sal,hiredate,dept_no) 
+  		   values(#{ename},#{sal},#{hiredate},#{dept.deptno})
+  </insert>
+  
+  <update id="update" flushCache="true">
+  	update emp set ename=#{ename} where empno=#{empno}
+  </update>
+  
+  
+  <sql id="cols">
+  	empno,ename,sal,hiredate,dept_no,deptno,dname,loc
+  </sql>
+  
+   
+  <!-- 多对一 -->
+  <resultMap type="Emp" id="empMap">
+  	<id column="empno" property="empno"/>  
+  	<association property="dept" column="dept_no" select="selectDept"/>  
+  </resultMap>
+  
+  <select id="selectDept" resultType="Dept">
+  	select * from dept where deptno=#{deptno}
+  </select>
+
+  <select id="select" resultMap="empMap" flushCache="false">
+  	select * from emp
+  </select>
+  
+  <select id="selectById" resultMap="empMap" useCache="true">
+  	select * from emp where empno=#{empno}
+  </select>
+  
+  <select id="page" statementType="CALLABLE" parameterType="map" useCache="false">
+  	{call proc_emp(#{pindex,mode=IN},#{psize,mode=IN},#{rs,mode=OUT,jdbcType=CURSOR,resultMap=mycursor})}
+  </select> 
+  
+  <resultMap type="map" id="mycursor">
+  	
+  </resultMap>
+  
+</mapper>

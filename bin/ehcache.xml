@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">  
+   
+	<diskStore path="java.io.tmpdir"/>
+
+	<defaultCache 
+		overflowToDisk="true" 
+		timeToLiveSeconds="30000" 
+		timeToIdleSeconds="300" 
+		eternal="false" 
+		maxElementsInMemory="1024"
+		memoryStoreEvictionPolicy="LRU"/> 
+
+	<cache name="zzugxy" 
+    		overflowToDisk="true" 
+    		eternal="false"  
+        	timeToIdleSeconds="300" 
+        	timeToLiveSeconds="600"  
+        	maxEntriesLocalHeap="0" 
+        	maxEntriesLocalDisk="0"      
+        	diskPersistent="true" 
+        	diskExpiryThreadIntervalSeconds="300"  
+       		diskSpoolBufferSizeMB="100" 
+        	memoryStoreEvictionPolicy="LRU" /> 
+  
+</ehcache>  
+

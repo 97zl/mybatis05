@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- namespace映射dao接口的全路径 -->
+<mapper namespace="com.cssl.dao.StudentMapper">
+
+  <insert id="insert" keyColumn="sid" keyProperty="sid">
+  	insert into student(sname,borndate) values(#{sname},#{borndate})
+  </insert>
+  
+  <insert id="insertBach" keyColumn="sid" keyProperty="sid">
+  	insert into student(sname,borndate) values
+  	<foreach item="stu" collection="list" separator=",">
+    	(#{stu.sname},#{stu.borndate})
+  	</foreach>  	
+  </insert>
+  
+  <update id="update">
+  	update student 
+  		<set>
+  			<if test="sname != null and sname != ''">
+		  		sname = #{sname},
+		  	</if>
+		  	<if test="borndate != null">
+		  		borndate = #{borndate},
+		  	</if>
+  		</set>
+  		<where>
+  		  <choose>
+  			<when test="sid != null and sid != 0">
+		  		sid = #{sid}
+		  	</when>
+		  	<otherwise>
+		  		1=0
+		  	</otherwise>
+		  </choose>
+  		</where>
+  </update>
+  
+  <delete id="delete">
+  	delete from student <include refid="condition2"/>
+  </delete>
+  
+  <sql id="condition">
+	  <where>
+	  	<if test="sid != null and sid != 0">
+	  		and sid = #{sid}
+	  	</if>
+	  	<if test="sname != null and sname != ''">
+	  		and sname like concat('%',#{sname},'%')
+	  	</if>
+	  	<if test="borndate != null">
+	  		or borndate &lt; #{borndate}
+	  	</if>
+	  </where>
+	  <if test="column != null and ord != null">
+	  	order by ${column} ${ord}
+	  </if>	 
+	  <if test="first!=null and size!=null">
+	  	limit #{first},#{size}  <!--不能做运算#{pageIndex*pageSize}-->
+	  </if>	 
+  </sql>
+  
+  <select id="select" resultType="Student">
+    select <include refid="cols"/> from student <include refid="condition"/>
+  </select>
+  
+  <sql id="condition2">
+	  <trim prefix="WHERE" prefixOverrides="AND |OR ">
+	  	<choose>
+	  		<when test="sid != null and sid != 0">
+		  		sid = #{sid}
+		  	</when>
+		  	<when test="sname != null and sname != ''">
+		  		sname like concat('%',#{sname},'%')
+		  	</when>
+		  	<when test="borndate != null">
+		  	 <![CDATA[ and borndate <= #{borndate} ]]>		  		
+		  	</when>
+		  	<otherwise>
+		  		1=0
+		  	</otherwise>
+	  	</choose>	  	
+	  </trim>
+  </sql>
+
+  <sql id="cols">
+  	sid,sname,borndate
+  </sql>
+
+  <select id="selectById" resultType="Student">
+    select <include refid="cols"/> from student 
+		where sid in 
+		<foreach item="id" collection="list"
+      		open="(" separator="," close=")">
+        		#{id}
+  		</foreach>
+  </select>
+
+  
+  <select id="selectLike" resultType="Student">
+  	<bind name="pattern" value="'%' + _parameter.sname + '%'" />
+    select <include refid="cols"/> from student 
+    	where sname like #{pattern}
+  </select>
+  
+  
+  
+  
+</mapper>

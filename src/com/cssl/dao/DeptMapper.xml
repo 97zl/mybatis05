@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- namespace映射dao接口的全路径 -->
+<mapper namespace="com.cssl.dao.DeptMapper">
+
+  <cache-ref namespace="com.cssl.dao.EmpMapper"/>
+
+  <insert id="insert" parameterType="Dept"
+  	keyColumn="deptno" keyProperty="deptno">
+  	insert into dept(dname,loc) values(#{dname},#{loc})
+  </insert>
+  
+  <!-- 一对多 -->
+  <resultMap type="Dept" id="deptMap">
+  	<id column="deptno" property="deptno"/>
+  	<collection property="emps" column="deptno" select="selectEmp"/>
+  </resultMap>
+  
+  <select id="selectEmp" resultType="Emp">
+  	select * from emp where dept_no=#{deptno}
+  </select>
+ 
+  <select id="select" resultMap="deptMap">
+  	select * from dept
+  </select>
+  
+
+  
+</mapper>
